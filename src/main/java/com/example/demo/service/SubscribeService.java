@@ -7,6 +7,7 @@ import com.example.demo.model.Subscription;
 import com.example.demo.model.User;
 import com.example.demo.repository.SubscriptionRepository;
 import com.example.demo.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class SubscribeService {
     private final UserRepository userRep;
     private final SubscriptionRepository subRep;
 
-
+    @Transactional
     public ResponseEntity<?> createSubscription(Long id, SubscriptionDTO subscriptionDTO) {
         checkUserExist(id);
         Subscription newSub = new Subscription(userRep.getReferenceById(id), subscriptionDTO.subscribeName());
@@ -30,6 +31,7 @@ public class SubscribeService {
         return ResponseEntity.ok("Saved successfully");
     }
 
+    @Transactional
     public ResponseEntity<?> getSubscription(Long id) {
         checkUserExist(id);
         List<Subscription> allUserSubs = subRep.findByUserId(userRep.getReferenceById(id));
@@ -40,12 +42,14 @@ public class SubscribeService {
         return ResponseEntity.ok(subsResult);
     }
 
+    @Transactional
     public ResponseEntity<?> delSubscription(Long id, Long subId) {
         checkUserExist(id);
         subRep.deleteById(subId);
         return ResponseEntity.ok("Deleted successfully");
     }
 
+    @Transactional
     public ResponseEntity<?> getTopSubscriptions() {
         List<Subscription> subs = subRep.findAll();
         List<String> countForId = subs.stream().collect(Collectors.groupingBy(Subscription::getSubscriptionName, Collectors.counting()))
